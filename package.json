@@ -3,6 +3,14 @@
   "version": "1.0.0",
   "author": "Yu Nozato",
   "license": "MIT",
+  "source": "src/index.ts",
+  "main": "dist/mq-emit.js",
+  "module": "dist/mq-emit.module.js",
+  "unpkg": "dist/mq-emit.umd.js",
+  "scripts": {
+    "build": "microbundle",
+    "dev": "microbundle watch"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.8.0",
     "@typescript-eslint/parser": "^3.8.0",
