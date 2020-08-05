@@ -24,10 +24,17 @@ type ManageMap = Map<string, RegisterData>
 const map: ManageMap = new Map()
 
 function handleChange(event: MediaQueryListEvent): void {
-  const handlers = map.get(event.media)?.handlers
+  // Syntax Error on Tersre...
+  // const handlers = map.get(event.media)?.handlers
 
-  if (handlers != null) {
-    handlers.forEach((handler) => handler(event))
+  const registerData = map.get(event.media)
+
+  if (!registerData) {
+    return
+  }
+
+  if (registerData.handlers != null) {
+    registerData.handlers.forEach((handler) => handler(event))
   }
 }
 
@@ -50,7 +57,7 @@ const manager = {
   register({ mediaQueryString, handler }: RegisterPayload): RegisterResult {
     const newMediaQueryList = window.matchMedia(mediaQueryString)
     const { mediaQueryList, handlers } =
-      map.get(newMediaQueryList.media) ??
+      map.get(newMediaQueryList.media) ||
       registerInitialData(mediaQueryString, newMediaQueryList)
 
     handlers.push(handler)
