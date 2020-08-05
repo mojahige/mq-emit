@@ -7,6 +7,7 @@ export type MediaQueryString = string
 type Handlers = Handler[]
 
 type RegisterData = {
+  mediaQueryString: MediaQueryString
   mediaQueryList: MediaQueryList
   handlers: Handlers
 }
@@ -16,103 +17,63 @@ type RegisterPayload = {
   handler: Handler
 }
 
+type RegisterResult = MediaQueryList | undefined
+
 type ManageMap = Map<string, RegisterData>
 
 const map: ManageMap = new Map()
 
-function hasData(mediaQueryString: MediaQueryString): boolean {
-  return map.has(mediaQueryString)
+function handleChange(event: MediaQueryListEvent): void {
+  const handlers = map.get(event.media)?.handlers
+
+  if (handlers != null) {
+    handlers.forEach((handler) => handler(event))
+  }
 }
 
-function getData(mediaQueryString: MediaQueryString): RegisterData | undefined {
-  return map.get(mediaQueryString)
-}
-
-function setData(
+function registerInitialData(
   mediaQueryString: MediaQueryString,
-  registerData: RegisterData
-): void {
-  map.set(mediaQueryString, registerData)
-}
-
-function deleteData(mediaQueryString: MediaQueryString): void {
-  map.delete(mediaQueryString)
-}
-
-function addHandler(handlers: Handlers, addHandler: Handler): void {
-  handlers.push(addHandler)
-}
-
-function removeHandler(handlers: Handlers, removeHandler: Handler): void {
-  handlers.splice(handlers.indexOf(removeHandler), 1)
-}
-
-function registerNewData(mediaQueryString: MediaQueryString): void {
-  const mediaQueryList = window.matchMedia(mediaQueryString)
-  const data: RegisterData = {
+  mediaQueryList: MediaQueryList
+): RegisterData {
+  const data = {
+    mediaQueryString,
     mediaQueryList,
     handlers: [],
   }
 
-  mediaQueryList.addEventListener('change', changeHandler)
+  map.set(mediaQueryList.media, data)
 
-  setData(mediaQueryString, data)
-}
-
-function fire(registerData: RegisterData) {
-  registerData.handlers.forEach((handler) =>
-    handler(registerData.mediaQueryList)
-  )
-}
-
-function changeHandler(event: MediaQueryListEvent): void {
-  Array.from(map.values())
-    .filter((registerData) => registerData.mediaQueryList.media === event.media)
-    .forEach((data) => fire(data))
-}
-
-function addListner(mediaQueryList: MediaQueryList) {
-  mediaQueryList.addEventListener('change', changeHandler)
-}
-
-function removeListner(mediaQueryList: MediaQueryList) {
-  mediaQueryList.removeEventListener('change', changeHandler)
+  return data
 }
 
 const manager = {
-  register({
-    mediaQueryString,
-    handler,
-  }: RegisterPayload): MediaQueryList | undefined {
-    if (!hasData(mediaQueryString)) {
-      registerNewData(mediaQueryString)
-    }
+  register({ mediaQueryString, handler }: RegisterPayload): RegisterResult {
+    const newMediaQueryList = window.matchMedia(mediaQueryString)
+    const { mediaQueryList, handlers } =
+      map.get(newMediaQueryList.media) ??
+      registerInitialData(mediaQueryString, newMediaQueryList)
 
-    const registerData = getData(mediaQueryString)
+    handlers.push(handler)
+    mediaQueryList.addEventListener('change', handleChange)
 
-    if (!registerData) {
-      return undefined
-    }
-
-    addHandler(registerData.handlers, handler)
-    addListner(registerData.mediaQueryList)
-
-    return registerData.mediaQueryList
+    return mediaQueryList
   },
 
   unregister({ mediaQueryString, handler }: RegisterPayload): void {
-    const registerData = getData(mediaQueryString)
+    const registerData = map.get(window.matchMedia(mediaQueryString).media)
 
     if (!registerData) {
       return
     }
 
-    removeHandler(registerData.handlers, handler)
-    removeListner(registerData.mediaQueryList)
+    const { mediaQueryList, handlers } = registerData
+    const handlerIndex = handlers.indexOf(handler)
 
-    if (!registerData.handlers.length) {
-      deleteData(mediaQueryString)
+    if (handlerIndex > -1) {
+      handlers.splice(handlerIndex)
     }
+
+    mediaQueryList.removeEventListener('change', handleChange)
   },
 }
 
