@@ -9,7 +9,8 @@
   "unpkg": "dist/mq-emit.umd.js",
   "scripts": {
     "build": "microbundle",
-    "dev": "microbundle watch"
+    "dev": "microbundle watch",
+    "test": "jest"
   },
   "devDependencies": {
     "@types/jest": "^26.0.9",
