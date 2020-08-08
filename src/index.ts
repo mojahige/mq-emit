@@ -1,5 +1,4 @@
 import manager from './manager'
-
 import type { Handler, MediaQueryString } from './manager'
 
 export const on = (

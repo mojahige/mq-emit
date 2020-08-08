@@ -11,14 +11,11 @@ type RegisterData = {
   mediaQueryList: MediaQueryList
   handlers: Handlers
 }
-
 type RegisterPayload = {
   mediaQueryString: MediaQueryString
   handler: Handler
 }
-
 type RegisterResult = MediaQueryList | undefined
-
 type ManageMap = Map<string, RegisterData>
 
 const map: ManageMap = new Map()
