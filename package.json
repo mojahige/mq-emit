@@ -10,7 +10,8 @@
   "scripts": {
     "build": "microbundle",
     "dev": "microbundle watch",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "npm run build"
   },
   "devDependencies": {
     "@types/jest": "^26.0.9",
