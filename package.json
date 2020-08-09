@@ -11,7 +11,7 @@
     "build": "microbundle",
     "dev": "microbundle watch",
     "test": "jest",
-    "postinstall": "npm run build"
+    "prepare": "npm run build"
   },
   "devDependencies": {
     "@types/jest": "^26.0.9",
