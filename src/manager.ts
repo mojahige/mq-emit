@@ -74,7 +74,7 @@ const manager = {
     const handlerIndex = handlers.indexOf(handler)
 
     if (handlerIndex > -1) {
-      handlers.splice(handlerIndex)
+      handlers.splice(handlerIndex, 1)
     }
 
     mediaQueryList.removeEventListener('change', handleChange)
